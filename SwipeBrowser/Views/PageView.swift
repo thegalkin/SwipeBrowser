@@ -29,7 +29,7 @@ struct PageView: View {
             }
         }
     }
-    
+    //TODO: do a barrel row with new page
     var content: some View {
         GeometryReader { geo in
             VStack {

@@ -9,6 +9,7 @@ import SwiftUI
 /**Нижний бар с адресной строкой**/
 struct BottomBarView: View {
     @EnvironmentObject var pageViewModel: PageViewModel
+    @EnvironmentObject var browserController: BrowserController
     var body: some View {
             BackgroundRectangle.overlay{
                 AddressOrSearchWord
@@ -53,8 +54,7 @@ struct BottomBarView: View {
     
     private var newTabButton: some View {
         Button {
-//            self.pageViewModel.isShowingTabsView = true
-            //TODO: - create a new tab
+            self.browserController.openNewEmptyPage ()
         } label: {
             Image(systemName: "rectangle.stack.fill.badge.plus")
                 .foregroundStyle(.green, .bar)
