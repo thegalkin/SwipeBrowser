@@ -8,9 +8,13 @@
 import Combine
 import SwiftUI
 
-@MainActor
+//@MainActor
 final class BrowserController: ObservableObject {
+    //orders
     @Published var newPageOrderPromised: Bool = false
+    
+    //params
+    @Published var newPageButtonIsOn: Bool = true
     
     var favoriteLinks: [Int : FavoriteLink] {
         get {

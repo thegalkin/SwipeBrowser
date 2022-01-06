@@ -7,6 +7,7 @@
 
 import SwiftUI
 /** Уровень свайпов*/
+
 struct PageView: View {
     @StateObject var pageViewModel: PageViewModel = .init()
     @EnvironmentObject var browserController: BrowserController
@@ -19,18 +20,30 @@ struct PageView: View {
     let offset: CGFloat = 40
     
     var body: some View {
-        ZStack {
-            contentWithEffect
-            VStack {
-                Spacer ()
-                Spacer ()
-                BottomBarView ()
-                    .environmentObject(pageViewModel)
+//        if browserController.newPageOrderPromised{
+//            newPage
+//        } else {
+        ZStack(alignment: Alignment.center) {
+                currentPageWithEffect
+                newPageWithEffect
+                VStack {
+                    Spacer ()
+                    Spacer ()
+                    BottomBarView ()
+                        .environmentObject(pageViewModel)
+                }
+            }
+        .onReceive(self.browserController.$newPageOrderPromised) {
+            if $0 {
+                self.presentNewPage()
             }
         }
+//        }
+        
     }
-    //TODO: do a barrel row with new page
-    var content: some View {
+    
+//    MARK: - Current Page
+    private var currentPage: some View {
         GeometryReader { geo in
             VStack {
                 WebContentView ()
@@ -42,16 +55,33 @@ struct PageView: View {
             }
         }
     }
-    
-    var contentWithEffect: some View {
-        content
-            .rotationEffect(self.rotationScale.wrappedValue)
-            .scaleEffect(self.scaleScale.wrappedValue)
+
+    private var currentPageWithEffect: some View {
+        currentPage
+            .rotationEffect(self.currentPageRotationScale.wrappedValue)
+            .scaleEffect(self.currentPageScaleScale.wrappedValue)
             .gesture(self.leftPanGesture)
-            .offset(x: pageOffset, y: yOffset.wrappedValue)
+            .offset(x: pageOffset, y: currentPageYOffset.wrappedValue)
     }
     
-    private var rotationScale: Binding<Angle> {
+//    MARK: - New Page
+    private var newPage: some View {
+        GeometryReader { geo in
+            NewPageView()
+                .environmentObject(browserController)
+        }
+    }
+    
+    private var newPageWithEffect: some View {
+        newPage
+            .rotationEffect(self.newPageRotationScale.wrappedValue, anchor: .center)
+            .scaleEffect(self.newPageScaleScale.wrappedValue)
+            .gesture(self.leftPanGesture)
+            .offset(x: self.newPageXOffset.wrappedValue, y: self.newPageYOffset.wrappedValue)
+    }
+    
+//    MARK: - Rotation Effect For Current Page
+    private var currentPageRotationScale: Binding<Angle> {
         if -pageOffset > minSwipeOffset {
             let angle: Angle = Angle.degrees(Double(-90.0))
             let binding: Binding = Binding.constant(angle)
@@ -64,7 +94,7 @@ struct PageView: View {
         }
     }
     
-    private var scaleScale: Binding<Double> {
+    private var currentPageScaleScale: Binding<Double> {
         if pageOffset == 0 {
             let binding: Binding = Binding.constant(Double(1))
             return binding
@@ -75,6 +105,59 @@ struct PageView: View {
         }
     }
     
+    private var currentPageYOffset: Binding<CGFloat> {
+        if self.pageOffset == 0 {
+            let binding: Binding = Binding.constant(CGFloat(0))
+            return binding
+        } else {
+            let res: CGFloat = -self.pageOffset * 1.5
+            let binding: Binding = Binding.constant(res)
+            return binding
+        }
+        
+    }
+    
+    //    MARK: - Rotation Effect For New Page
+    private var newPageRotationScale: Binding<Angle> {
+        let scale: Double = .init(abs(self.rotationProgressPercentageCGFloat * CGFloat(90.0) - CGFloat(90)))
+        let angle: Angle = Angle.degrees(scale)
+        let binding: Binding = Binding.constant(angle)
+        return binding
+    }
+    
+    private var newPageScaleScale: Binding<Double> {
+        let res: Double = self.rotationProgressPercentageDouble
+        let binding: Binding = Binding.constant(res)
+        return binding
+    }
+    
+    private var newPageYOffset: Binding<CGFloat> {
+        let startOffset: CGFloat = self.screenHeight
+        let res: CGFloat = startOffset - screenHeight * self.rotationProgressPercentageCGFloat
+        let binding: Binding = Binding.constant(res)
+        return binding
+    }
+    
+    private var newPageXOffset: Binding<CGFloat> {
+        let startOffset: CGFloat = self.screenWidth
+        let res: CGFloat = startOffset + self.pageOffset
+        let binding: Binding<CGFloat> = Binding.constant(res)
+        return binding
+    }
+    
+    private var rotationProgressPercentageCGFloat: CGFloat {
+        let positiveHorizontalOffset: CGFloat = abs(self.pageOffset)
+        let percent: CGFloat = positiveHorizontalOffset / self.screenWidth
+        return percent
+    }
+    
+    private var rotationProgressPercentageDouble: Double {
+        let positiveHorizontalOffset: Double = abs(Double(self.pageOffset))
+        let percent: Double = positiveHorizontalOffset / self.screenWidth
+        return percent
+    }
+    
+//    MARK: - Common Left Pan Gesture
     private var leftPanGesture: some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { changePos in
@@ -107,17 +190,16 @@ struct PageView: View {
             }
     }
     
-    private var yOffset: Binding<CGFloat> {
-        if self.pageOffset == 0 {
-            let binding: Binding = Binding.constant(CGFloat(0))
-            return binding
-        } else {
-            let res: CGFloat = -self.pageOffset * 1.5
-            let binding: Binding = Binding.constant(res)
-            return binding
+    private func presentNewPage () {
+        withAnimation {
+            self.pageOffset = -self.screenWidth
         }
-        
+        let milliseconds: Int = Int(self.pageDissapearTime) * 1000
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
+            self.browserController.newPageOrderPromised = false
+        }
     }
+    
 }
 
 struct PageView_Previews: PreviewProvider {

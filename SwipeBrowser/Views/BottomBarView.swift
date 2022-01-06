@@ -10,6 +10,7 @@ import SwiftUI
 struct BottomBarView: View {
     @EnvironmentObject var pageViewModel: PageViewModel
     @EnvironmentObject var browserController: BrowserController
+    
     var body: some View {
             BackgroundRectangle.overlay{
                 AddressOrSearchWord
@@ -17,30 +18,38 @@ struct BottomBarView: View {
             .frame(width: .infinity, height: 34)
             .ignoresSafeArea(SafeAreaRegions.all, edges: Edge.Set.bottom)
     }
+    
     //TODO: - добавить поисковое слово из поискового запроса
     private var AddressOrSearchWord: some View {
         Text(self.pageViewModel.currentAddress?.host ?? "")
             .foregroundColor(.white)
     }
+    
     private var BackgroundRectangle: some View {
         GeometryReader { size in
-            Rectangle()
+            Rectangle ()
                 .background(.thinMaterial)
                 .overlay {
                     HStack{
                         tabsButton
-                        RoundedRectangle(cornerRadius: 5)
-                            .frame(
-                                   height: size.size.height - 10,
-                                   alignment: .center
-                            )
-                            .opacity(0.2)
+                        addressField(in: size)
                         newTabButton
                     }
                     
                 }
         }
     }
+    
+    @ViewBuilder
+    private func addressField(in size: GeometryProxy) -> some View{
+        RoundedRectangle(cornerRadius: 5)
+            .frame(
+                height: size.size.height - 10,
+                alignment: .center
+            )
+            .opacity(0.2)
+    }
+    
     private var tabsButton: some View {
         Button {
             self.pageViewModel.isShowingTabsView = true

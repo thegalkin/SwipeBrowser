@@ -9,24 +9,48 @@ import SwiftUI
 /**Новая страница с видео вставкой**/
 struct NewPageView: View {
     @EnvironmentObject var browserController: BrowserController
+    
     let cardWidth: CGFloat = UIScreen.main.bounds.width / 3
     let cornerRadius: CGFloat = 10
-    var body: some View {
-        LazyVGrid(columns: coloumns, alignment: .center, spacing: self.cardWidth) {
-            ForEach(browserController.favoriteLinks.keys.sorted(by: >), id: \.self) { key in
-                generateLink(with: browserController.favoriteLinks[key])
-            }
-        }
+    
+    private var favoriteLinksArray: Binding<Array<Int>> {
+        return Binding.constant(self.browserController.favoriteLinks.keys.sorted(by: <))
     }
     
-    private var coloumns: [GridItem] {
-        Array<GridItem>.init(repeating:
-                                GridItem(.fixed(cardWidth),
-                                         spacing: cardWidth,
-                                         alignment: Alignment.center),
-                             count: 2
-        )
+    var body: some View {
+        ZStack {
+            Color.primary
+            
+                VStack {
+                    Spacer ()
+                    ForEach(0..<3) { key in
+                        HStack{
+                            Spacer ()
+                            generateLink(with: browserController.favoriteLinks[key])
+                            Spacer ()
+                            generateLink(with: browserController.favoriteLinks[key])
+                            Spacer ()
+                        }
+                        Spacer ()
+                    }
+                    Spacer ()
+                }
+            
+        }.ignoresSafeArea()
+        
+        
+        
+        
     }
+    
+//    private var coloumns: [GridItem] {
+//        Array<GridItem>.init(repeating:
+//                                GridItem(.fixed(cardWidth),
+//                                         spacing: cardWidth,
+//                                         alignment: Alignment.center),
+//                             count: 2
+//        )
+//    }
     
     private func linkCell(opens favoriteLink: FavoriteLink) -> some View {
         generateLink(with: favoriteLink)
@@ -57,18 +81,33 @@ struct NewPageView: View {
     }
     
     private var emptyCell: some View {
-        RoundedRectangle(cornerRadius: self.cornerRadius)
+        Button(action:{
+            //TODO: add new link
+        }){
+        Rectangle ()
             .frame(width: self.cardWidth, height: self.cardWidth)
+            .background(.ultraThickMaterial)
+            .overlay {
+                Image(systemName: "plus").foregroundColor(Color.green)
+//                    .frame(width: self.cardWidth, height: self.cardWidth, alignment: .center)
+                    .font(.system(size: 50))
+            }
+            .cornerRadius(self.cornerRadius)
+            
+        }.buttonStyle(.plain)
     }
+    
     
     
     
     
 }
 
-struct NewPageView_Previews: PreviewProvider {
-    static var previews: some View {
-        NewPageView ()
-        //        ContentView ()
-    }
-}
+//struct NewPageView_Previews: PreviewProvider {
+//    @StateObject static var browserController: BrowserController = .init()
+//    static var previews: some View {
+//        NewPageView ()
+//            .environmentObject(browserController)
+//        //        ContentView ()
+//    }
+//}
