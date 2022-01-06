@@ -20,9 +20,6 @@ struct PageView: View {
     let offset: CGFloat = 40
     
     var body: some View {
-//        if browserController.newPageOrderPromised{
-//            newPage
-//        } else {
         ZStack(alignment: Alignment.center) {
                 currentPageWithEffect
                 newPageWithEffect
@@ -57,11 +54,20 @@ struct PageView: View {
     }
 
     private var currentPageWithEffect: some View {
-        currentPage
-            .rotationEffect(self.currentPageRotationScale.wrappedValue)
-            .scaleEffect(self.currentPageScaleScale.wrappedValue)
-            .gesture(self.leftPanGesture)
-            .offset(x: pageOffset, y: currentPageYOffset.wrappedValue)
+        ZStack{
+            currentPage
+                .rotationEffect(self.currentPageRotationScale.wrappedValue)
+                .scaleEffect(self.currentPageScaleScale.wrappedValue)
+                .offset(x: pageOffset, y: currentPageYOffset.wrappedValue)
+            HStack {
+                Spacer ()
+                    .frame(width: self.screenWidth - 20)
+                Color.white
+                    .opacity(0.001)
+                    .gesture(self.leftPanGesture)
+            }
+        }
+
     }
     
 //    MARK: - New Page
@@ -76,7 +82,7 @@ struct PageView: View {
         newPage
             .rotationEffect(self.newPageRotationScale.wrappedValue, anchor: .center)
             .scaleEffect(self.newPageScaleScale.wrappedValue)
-            .gesture(self.leftPanGesture)
+//            .gesture(self.leftPanGesture)
             .offset(x: self.newPageXOffset.wrappedValue, y: self.newPageYOffset.wrappedValue)
     }
     
@@ -170,12 +176,12 @@ struct PageView: View {
                 }
             }
             .onEnded { endPos in
-                
+                let startPos: CGFloat = endPos.startLocation.x
                 let currentPos: CGFloat = endPos.location.x
                 let milliseconds: Int = Int(self.pageDissapearTime) * 1000
                 let speed: CGFloat = endPos.predictedEndLocation.x - currentPos
                 
-                if currentPos <= self.minSwipeOffset || speed < -15 {
+                if (currentPos <= self.minSwipeOffset || speed < -15) && startPos > minSwipeOffset {
                     withAnimation(.easeInOut(duration: self.pageDissapearTime)) {
                         self.pageOffset = -self.screenWidth
                     }

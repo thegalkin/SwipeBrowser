@@ -35,7 +35,6 @@ struct BottomBarView: View {
                         addressField(in: size)
                         newTabButton
                     }
-                    
                 }
         }
     }
