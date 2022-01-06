@@ -14,8 +14,7 @@ struct ContentView: View {
     @State var isShowingPage: Bool = false
     var body: some View {
         ZStack {
-            PageView ()
-//            NewPageView ()
+            PageView (open: URL(string: "https://shazoo.ru")!)
         }
         .environmentObject(browserController)
     }

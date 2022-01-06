@@ -10,11 +10,40 @@ import SwiftUI
 
 //@MainActor
 final class BrowserController: ObservableObject {
-    //orders
+    
+//  MARK: - Orders
     @Published var newPageOrderPromised: Bool = false
     
-    //params
+//  MARK: - Params
     @Published var newPageButtonIsOn: Bool = true
+    
+    
+    
+//  MARK: - ButtomBar commands
+    public func openNewEmptyPage() {
+        self.newPageOrderPromised = true
+    }
+    
+    public func openNewPage(with url: URL) {
+        
+    }
+    
+    
+//  MARK: - Favorite Links
+    //TODO: propper adding link as in Yandex Browser
+    public func addSiteToFavorites(with url: URL, at location: Int) {
+        
+        guard 0...5 ~= location else {return}
+        
+        let id: UUID = .init()
+        let isSpecial: Bool = false
+        let name: String = ""
+        let image: UIImage? = nil
+        let encodedImage: Data? = image?.pngData()
+        let newFavoriteLink: FavoriteLink = .init(id: id, url: url, isSpecial: isSpecial, name: name, image: encodedImage)
+        
+        self.favoriteLinks[location] = newFavoriteLink
+    }
     
     var favoriteLinks: [Int : FavoriteLink] {
         get {
@@ -34,32 +63,6 @@ final class BrowserController: ObservableObject {
             UserDefaults.standard.set(try? PropertyListEncoder().encode(newVal), forKey: "favoriteLinks")
             self.objectWillChange.send()
         }
-    }
-    
-    
-    
-    
-    public func openNewEmptyPage() {
-        self.newPageOrderPromised = true
-    }
-    
-    public func openNewPage(with url: URL) {
-        
-    }
-    
-    //TODO: propper adding link as in Yandex Browser
-    public func addSiteToFavorites(with url: URL, at location: Int) {
-        
-        guard 0...5 ~= location else {return}
-        
-        let id: UUID = .init()
-        let isSpecial: Bool = false
-        let name: String = ""
-        let image: UIImage? = nil
-        let encodedImage: Data? = image?.pngData()
-        let newFavoriteLink: FavoriteLink = .init(id: id, url: url, isSpecial: isSpecial, name: name, image: encodedImage)
-        
-        self.favoriteLinks[location] = newFavoriteLink
     }
 }
 

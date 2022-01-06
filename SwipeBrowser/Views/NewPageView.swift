@@ -36,21 +36,18 @@ struct NewPageView: View {
                     Spacer ()
                 }
             
-        }.ignoresSafeArea()
-        
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            self.browserController.newPageButtonIsOn = false
+        }
+        .onDisappear {
+            self.browserController.newPageButtonIsOn = true
+        }
         
         
         
     }
-    
-//    private var coloumns: [GridItem] {
-//        Array<GridItem>.init(repeating:
-//                                GridItem(.fixed(cardWidth),
-//                                         spacing: cardWidth,
-//                                         alignment: Alignment.center),
-//                             count: 2
-//        )
-//    }
     
     private func linkCell(opens favoriteLink: FavoriteLink) -> some View {
         generateLink(with: favoriteLink)

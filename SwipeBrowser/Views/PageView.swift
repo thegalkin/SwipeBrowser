@@ -6,9 +6,17 @@
 //
 
 import SwiftUI
-/** Уровень свайпов*/
 
+/**
+ Уровень свайпов для вкладки
+ - Parameters:
+ - open: Открывает ссылку в новой вкладке.
+ 
+ */
 struct PageView: View {
+    
+    let open: URL
+    
     @StateObject var pageViewModel: PageViewModel = .init()
     @EnvironmentObject var browserController: BrowserController
     
@@ -23,20 +31,27 @@ struct PageView: View {
         ZStack(alignment: Alignment.center) {
                 currentPageWithEffect
                 newPageWithEffect
-                VStack {
-                    Spacer ()
-                    Spacer ()
-                    BottomBarView ()
-                        .environmentObject(pageViewModel)
-                }
+                bottomBar
             }
         .onReceive(self.browserController.$newPageOrderPromised) {
             if $0 {
                 self.presentNewPage()
             }
         }
-//        }
-        
+        .onAppear {
+            // странный способ инициализации, чтобы избежать бага с multiple appear
+            self.pageViewModel.setAddress(with: self.open)
+        }
+    }
+    
+//    MARK: - Buttom Bar
+    private var bottomBar: some View {
+        VStack {
+            Spacer ()
+            Spacer ()
+            BottomBarView ()
+                .environmentObject(pageViewModel)
+        }
     }
     
 //    MARK: - Current Page
@@ -47,8 +62,6 @@ struct PageView: View {
                     .environmentObject(pageViewModel)
                     .offset(x: 0, y: -self.offset)
                     .frame(height: geo.size.height + self.offset)
-                
-                //                        .offset(x: 0, y: -self.offset*2)
             }
         }
     }
@@ -186,7 +199,7 @@ struct PageView: View {
                         self.pageOffset = -self.screenWidth
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
-                        //отправка страницы в background?
+                        //TODO: отправка страницы в background?
                     }
                 } else {
                     withAnimation(.easeOut) {
