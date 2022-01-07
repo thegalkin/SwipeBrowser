@@ -38,12 +38,7 @@ struct NewPageView: View {
             
         }
         .ignoresSafeArea()
-        .onAppear {
-            self.browserController.newPageButtonIsOn = false
-        }
-        .onDisappear {
-            self.browserController.newPageButtonIsOn = true
-        }
+        
         
         
         

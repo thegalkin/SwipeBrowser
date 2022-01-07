@@ -28,6 +28,10 @@ final class BrowserController: ObservableObject {
         
     }
     
+    public func openNewPage(having str: String) {
+        
+    }
+    
     
 //  MARK: - Favorite Links
     //TODO: propper adding link as in Yandex Browser

@@ -53,12 +53,8 @@ struct PageView: View {
     
 //    MARK: - Buttom Bar
     private var bottomBar: some View {
-        VStack {
-            Spacer ()
-            Spacer ()
             BottomBarView ()
                 .environmentObject(pageViewModel)
-        }
     }
     
 //    MARK: - Current Page
@@ -79,7 +75,7 @@ struct PageView: View {
                 .rotationEffect(self.currentPageRotationScale.wrappedValue)
                 .scaleEffect(self.currentPageScaleScale.wrappedValue)
                 .offset(x: pageOffset, y: currentPageYOffset.wrappedValue)
-            leftPanGestureRecogniser
+            leftPanGestureRecogniserView
         }
 
     }
@@ -101,7 +97,7 @@ struct PageView: View {
     }
     
 //    MARK: - Left Pan Recognizer
-    private var leftPanGestureRecogniser: some View {
+    private var leftPanGestureRecogniserView: some View {
         HStack {
             Spacer ()
                 .frame(width: self.screenWidth - 20)

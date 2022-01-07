@@ -11,40 +11,84 @@ struct BottomBarView: View {
     @EnvironmentObject var pageViewModel: PageViewModel
     @EnvironmentObject var browserController: BrowserController
     
+    ///empty if there is a pageViewModel's nonempty
     @State private var interactableText: String = .init()
+    
     @State private var isShowingInteractableTextField: Bool = false
-//    @FocusState private var focusState: FocusState = Self.focusState.url
+    @FocusState private var isSerachFieldFocused: Bool
     
     let placeholder: String = String("Search or site...")
     
     var body: some View {
-        BackgroundRectangle.overlay{
-            if isShowingInteractableTextField{
-                
-            } else {
-                AddressOrSearchWord
-            }
-            
+        VStack {
+            resignFromKeyboardGestureRecogniserView
+            content
         }
-        .frame(width: .infinity, height: 34)
-        .ignoresSafeArea(SafeAreaRegions.all, edges: Edge.Set.bottom)
     }
     
+    
+    private var content: some View {
+        BackgroundRectangle
+            .frame(width: .infinity, height: 34)
+            .ignoresSafeArea(SafeAreaRegions.all, edges: Edge.Set.bottom)
+    }
+    
+    @ViewBuilder
+    private var resignFromKeyboardGestureRecogniserView: some View {
+        if self.isShowingInteractableTextField {
+            Color.white
+                .opacity(0.001)
+                .onTapGesture {
+                    withAnimation(Animation.easeInOut) {
+                        self.isSerachFieldFocused = false
+                        self.isShowingInteractableTextField = false
+                    }
+                }
+        } else {
+            Spacer ()
+        }
+    }
+    
+    private var currentAddressStringBinding: Binding<String> {
+        Binding(
+            get: {
+                let url: URL? = self.pageViewModel.currentAddress
+                    if let url: URL = url {
+                    let host: String = url.host ?? String()
+                    return host
+                } else {
+                    let val: String = self.interactableText
+                    return val
+                }
+            },
+            set: { (newVal: String) in
+                self.interactableText = newVal
+            }
+        )
+    }
     //TODO: - добавить поисковое слово из поискового запроса
-    private var AddressOrSearchWord: some View {
-        Text(self.pageViewModel.currentAddress?.host ?? "")
+    private var addressOrSearchWord: some View {
+//        Text(self.pageViewModel.currentAddress?.host ?? "")
+        Text("Shazoo.ru")
             .foregroundColor(.white)
     }
     
     private var interactableTextField: some View {
-        TextField(self.placeholder, text: self.$interactableText)
+        TextField("", text: self.currentAddressStringBinding)
+//            .tint(Color.white)
+            .focused(self.$isSerachFieldFocused)
+            .placeholder(when: self.currentAddressStringBinding.wrappedValue.isEmpty) {
+                Text(self.placeholder)
+                    .foregroundColor(.white)
+            }
+            
             .foregroundColor(.white)
             .onSubmit {
                 self.onBottomTextFieldSubmit ()
             }
             .textInputAutocapitalization(.never)
             .disableAutocorrection(true)
-            .border(.primary)
+            
             
     }
     
@@ -53,7 +97,7 @@ struct BottomBarView: View {
             Rectangle ()
                 .background(.thinMaterial)
                 .overlay {
-                    HStack{
+                    HStack {
                         tabsButton
                         addressField(in: size)
                         newTabButton
@@ -63,18 +107,45 @@ struct BottomBarView: View {
     }
     
     @ViewBuilder
-    private func addressField(in size: GeometryProxy) -> some View{
-        RoundedRectangle(cornerRadius: 5)
-            .frame(
-                height: size.size.height - 10,
-                alignment: .center
-            )
-            .opacity(0.2)
-            .onTapGesture {
-                withAnimation(Animation.easeInOut) {
-                    self.isShowingInteractableTextField = true
+    private func addressField(in size: GeometryProxy) -> some View {
+        ZStack(alignment: Alignment.center) {
+            RoundedRectangle(cornerRadius: 5)
+                .opacity(0.2)
+                .onTapGesture {
+                    withAnimation(Animation.easeInOut) {
+                        self.isShowingInteractableTextField = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)){
+                            self.isSerachFieldFocused = true
+                        }
+                    }
+                }
+            GeometryReader { textFieldSize in
+                if self.isShowingInteractableTextField {
+                    interactableTextField
+                        .transition(
+                            AnyTransition.offset(x: CGFloat(textFieldSize.size.width / CGFloat(3)),
+                                                 y: CGFloat(0)
+                                                )
+                                .combined(with: AnyTransition.opacity)
+                        )
+                } else {
+                    addressOrSearchWord
+//                        .transition(.offset(x: (textFieldSize.size.width / CGFloat(2)), y: CGFloat(0)))
+                        .transition(.asymmetric(insertion: AnyTransition.opacity.animation(Animation.easeOut(duration: 1)),
+                                                removal:
+                            AnyTransition.opacity.animation(Animation.easeOut(duration: 0.1))
+                                               )
+                                    )
+                        .frame(maxWidth: CGFloat.infinity, maxHeight: CGFloat.infinity)
                 }
             }
+            
+            
+        }
+        .frame(
+            height: size.size.height - 10,
+            alignment: .center
+        )
     }
     
     private var tabsButton: some View {
@@ -85,7 +156,6 @@ struct BottomBarView: View {
                 .foregroundStyle(.bar)
         }
         .padding()
-        
     }
     
     private var newTabButton: some View {
@@ -100,11 +170,34 @@ struct BottomBarView: View {
     }
     
     private func onBottomTextFieldSubmit () {
+        self.isSerachFieldFocused = false
+        
         self.isShowingInteractableTextField = false
+        
+        self.browserController.openNewPage(having: self.interactableText)
         //TODO: validate and open + autocheck 
     }
-    
+
 }
+
+
+struct NewPageView_Previews: PreviewProvider {
+    @StateObject static var browserController: BrowserController = .init()
+    @StateObject static var pageViewModel: PageViewModel = .init()
+    static var previews: some View {
+        ZStack {
+            NewPageView ()
+            BottomBarView()
+        }
+        .environmentObject(pageViewModel)
+        .environmentObject(browserController)
+        .onAppear {
+            self.pageViewModel.setAddress(with: URL(string: "https://shazoo.ru")!)
+        }
+        //        ContentView ()
+    }
+}
+
 //
 //fileprivate struct BottomTextFieldInteractable: View {
 //    //inner
