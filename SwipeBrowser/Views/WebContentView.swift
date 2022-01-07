@@ -32,6 +32,7 @@ struct WebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let wkWebView: WKWebView = .init()
         let refreshControll: UIRefreshControl = .init()
+        refreshControll.backgroundColor = .clear
         refreshControll.addTarget(context.coordinator, action: #selector(Coordinator.handleRefreshControl), for: .valueChanged)
         wkWebView.allowsBackForwardNavigationGestures = true
         wkWebView.scrollView.addSubview(refreshControll)
