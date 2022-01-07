@@ -26,6 +26,7 @@
 		395E1F93278324320091722B /* SwipeBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395E1F92278324320091722B /* SwipeBrowserTests.swift */; };
 		395E1F9D278324320091722B /* SwipeBrowserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395E1F9C278324320091722B /* SwipeBrowserUITests.swift */; };
 		395E1F9F278324320091722B /* SwipeBrowserUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395E1F9E278324320091722B /* SwipeBrowserUITestsLaunchTests.swift */; };
+		398250672788F0AD00B9668D /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398250662788F0AD00B9668D /* View.swift */; };
 		39FC7336278797540093B1CC /* ConditionalModifierExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39FC7327278797530093B1CC /* ConditionalModifierExtension.swift */; };
 		39FC7337278797540093B1CC /* ImageCompresser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39FC7328278797540093B1CC /* ImageCompresser.swift */; };
 		39FC7338278797540093B1CC /* safeSpaceExtencion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39FC7329278797540093B1CC /* safeSpaceExtencion.swift */; };
@@ -82,6 +83,7 @@
 		395E1F98278324320091722B /* SwipeBrowserUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwipeBrowserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		395E1F9C278324320091722B /* SwipeBrowserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBrowserUITests.swift; sourceTree = "<group>"; };
 		395E1F9E278324320091722B /* SwipeBrowserUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBrowserUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		398250662788F0AD00B9668D /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		39FC7327278797530093B1CC /* ConditionalModifierExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConditionalModifierExtension.swift; sourceTree = "<group>"; };
 		39FC7328278797540093B1CC /* ImageCompresser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCompresser.swift; sourceTree = "<group>"; };
 		39FC7329278797540093B1CC /* safeSpaceExtencion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = safeSpaceExtencion.swift; sourceTree = "<group>"; };
@@ -239,6 +241,7 @@
 				39FC7332278797540093B1CC /* RoundedCornersExtension.swift */,
 				39FC7329278797540093B1CC /* safeSpaceExtencion.swift */,
 				39FC7330278797540093B1CC /* StringExtencion.swift */,
+				398250662788F0AD00B9668D /* View.swift */,
 				39FC7335278797540093B1CC /* TextModifierExtension.swift */,
 				39FC7345278799DD0093B1CC /* ResignFromKeyboardExtension.swift */,
 			);
@@ -391,6 +394,7 @@
 				3900FFC927838EC1008EF3CB /* BrowserController.swift in Sources */,
 				39FC7341278797540093B1CC /* RoundedCornersExtension.swift in Sources */,
 				39FC733C278797540093B1CC /* HexUIColor.swift in Sources */,
+				398250672788F0AD00B9668D /* View.swift in Sources */,
 				3900FFBE27836BA3008EF3CB /* WebContentView.swift in Sources */,
 				395E1F7F278324310091722B /* ContentView.swift in Sources */,
 				3900FFC327836E59008EF3CB /* SettingsView.swift in Sources */,
