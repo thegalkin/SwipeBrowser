@@ -38,6 +38,13 @@ struct PageView: View {
                 self.presentNewPage()
             }
         }
+        .onChange(of: self.pageOffset) { (newVal: CGFloat) in
+            if newVal == -self.screenWidth {
+                self.pageViewModel.isShowingNewTabView = true
+            } else {
+                self.pageViewModel.isShowingNewTabView = false
+            }
+        }
         .onAppear {
             // странный способ инициализации, чтобы избежать бага с multiple appear
             self.pageViewModel.setAddress(with: self.open)
@@ -72,13 +79,7 @@ struct PageView: View {
                 .rotationEffect(self.currentPageRotationScale.wrappedValue)
                 .scaleEffect(self.currentPageScaleScale.wrappedValue)
                 .offset(x: pageOffset, y: currentPageYOffset.wrappedValue)
-            HStack {
-                Spacer ()
-                    .frame(width: self.screenWidth - 20)
-                Color.white
-                    .opacity(0.001)
-                    .gesture(self.leftPanGesture)
-            }
+            leftPanGestureRecogniser
         }
 
     }
@@ -97,6 +98,21 @@ struct PageView: View {
             .scaleEffect(self.newPageScaleScale.wrappedValue)
 //            .gesture(self.leftPanGesture)
             .offset(x: self.newPageXOffset.wrappedValue, y: self.newPageYOffset.wrappedValue)
+    }
+    
+//    MARK: - Left Pan Recognizer
+    private var leftPanGestureRecogniser: some View {
+        HStack {
+            Spacer ()
+                .frame(width: self.screenWidth - 20)
+            Color.white
+                .opacity(0.001)
+                .gesture(self.leftPanGesture)
+        }
+        
+        .frame(height: self.screenHeight - 50)
+//        .offset(x: 0, y: -34)
+        
     }
     
 //    MARK: - Rotation Effect For Current Page
