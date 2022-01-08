@@ -41,8 +41,10 @@ struct PageView: View {
         .onChange(of: self.pageOffset) { (newVal: CGFloat) in
             if newVal == -self.screenWidth {
                 self.pageViewModel.isShowingNewTabView = true
+                self.browserController.newPageButtonIsOn = false
             } else {
                 self.pageViewModel.isShowingNewTabView = false
+                self.browserController.newPageButtonIsOn = true
             }
         }
         .onAppear {

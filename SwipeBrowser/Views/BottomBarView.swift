@@ -100,7 +100,7 @@ struct BottomBarView: View {
                     HStack {
                         tabsButton
                         addressField(in: size)
-                        newTabButton
+                        rightBarButton
                     }
                 }
         }
@@ -158,6 +158,31 @@ struct BottomBarView: View {
         .padding()
     }
     
+    @ViewBuilder
+    private var rightBarButton: some View {
+        if self.pageViewModel.isShowingNewTabView {
+            searchButton
+        } else {
+            newTabButton
+        }
+    }
+    
+    private var searchButton: some View {
+        Button {
+            self.onBottomTextFieldSubmit()
+        } label: {
+            if self.isShowingInteractableTextField {
+                Image(systemName: "magnifyingglass.circle")
+                    .foregroundStyle(.green, .bar)
+            } else {
+                Image(systemName: "magnifyingglass.circle")
+                    .foregroundStyle(.gray)
+            }
+            
+        }
+        .padding()
+    }
+    
     private var newTabButton: some View {
         Button {
             self.browserController.openNewEmptyPage ()
@@ -171,7 +196,6 @@ struct BottomBarView: View {
     
     private func onBottomTextFieldSubmit () {
         self.isSerachFieldFocused = false
-        
         self.isShowingInteractableTextField = false
         
         self.browserController.openNewPage(having: self.interactableText)
@@ -192,6 +216,7 @@ struct NewPageView_Previews: PreviewProvider {
         .environmentObject(pageViewModel)
         .environmentObject(browserController)
         .onAppear {
+            self.pageViewModel.isShowingNewTabView = true
             self.pageViewModel.setAddress(with: URL(string: "https://shazoo.ru")!)
         }
         //        ContentView ()
