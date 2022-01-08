@@ -12,7 +12,7 @@ import SwiftUI
 final class BrowserController: ObservableObject {
     
 //  MARK: - Orders
-    @Published var newPageOrderPromised: Bool = false
+    @Published var newTabOrderPromised: Bool = false
     
 //  MARK: - Params
     @Published var newPageButtonIsOn: Bool = true
@@ -21,7 +21,7 @@ final class BrowserController: ObservableObject {
     
 //  MARK: - ButtomBar commands
     public func openNewEmptyPage() {
-        self.newPageOrderPromised = true
+        self.newTabOrderPromised = true
     }
     
     public func openNewPage(with url: URL) {

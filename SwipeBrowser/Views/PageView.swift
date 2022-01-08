@@ -33,9 +33,9 @@ struct PageView: View {
                 newPageWithEffect
                 bottomBar
             }
-        .onReceive(self.browserController.$newPageOrderPromised) {
+        .onReceive(self.browserController.$newTabOrderPromised) {
             if $0 {
-                self.presentNewPage()
+                self.presentNewTab()
             }
         }
         .onChange(of: self.pageOffset) { (newVal: CGFloat) in
@@ -223,14 +223,19 @@ struct PageView: View {
             }
     }
     
-    private func presentNewPage () {
+    private func presentNewTab () {
         withAnimation {
             self.pageOffset = -self.screenWidth
         }
+        
         let milliseconds: Int = Int(self.pageDissapearTime) * 1000
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
-            self.browserController.newPageOrderPromised = false
+            self.browserController.newTabOrderPromised = false
         }
+    }
+    
+    private func presentNewSite (with url: URL) {
+        
     }
     
 }

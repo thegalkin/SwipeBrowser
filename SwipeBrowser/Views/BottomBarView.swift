@@ -52,13 +52,18 @@ struct BottomBarView: View {
     private var currentAddressStringBinding: Binding<String> {
         Binding(
             get: {
-                let url: URL? = self.pageViewModel.currentAddress
-                    if let url: URL = url {
-                    let host: String = url.host ?? String()
-                    return host
-                } else {
+                if self.pageViewModel.isShowingNewTabView{
                     let val: String = self.interactableText
                     return val
+                } else {
+                    let url: URL? = self.pageViewModel.currentAddress
+                    if let url: URL = url {
+                        let host: String = url.host ?? String()
+                        return host
+                    } else {
+                        let val: String = self.interactableText
+                        return val
+                    }
                 }
             },
             set: { (newVal: String) in
@@ -66,11 +71,16 @@ struct BottomBarView: View {
             }
         )
     }
+    @ViewBuilder
     //TODO: - добавить поисковое слово из поискового запроса
     private var addressOrSearchWord: some View {
-//        Text(self.pageViewModel.currentAddress?.host ?? "")
-        Text("Shazoo.ru")
-            .foregroundColor(.white)
+        if self.pageViewModel.isShowingNewTabView {
+            Text(self.placeholder)
+                .foregroundColor(.white)
+        } else {
+            Text(self.pageViewModel.currentAddress?.host ?? "")
+                .foregroundColor(.white)
+        }
     }
     
     private var interactableTextField: some View {
