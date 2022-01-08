@@ -15,6 +15,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             PageView (open: URL(string: "https://beta.shazoo.ru")!)
+                .transition(.windmillRotationEnter)
         }
         .environmentObject(browserController)
     }
