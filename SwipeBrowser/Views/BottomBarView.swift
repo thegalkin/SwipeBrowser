@@ -122,12 +122,7 @@ struct BottomBarView: View {
             RoundedRectangle(cornerRadius: 5)
                 .opacity(0.2)
                 .onTapGesture {
-                    withAnimation(Animation.easeInOut) {
-                        self.isShowingInteractableTextField = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)){
-                            self.isSerachFieldFocused = true
-                        }
-                    }
+                    self.onQuickPickAddressContainerTapped ()
                 }
             GeometryReader { textFieldSize in
                 if self.isShowingInteractableTextField {
@@ -147,6 +142,9 @@ struct BottomBarView: View {
                                                )
                                     )
                         .frame(maxWidth: CGFloat.infinity, maxHeight: CGFloat.infinity)
+                        .onTapGesture {
+                            self.onQuickPickAddressContainerTapped ()
+                        }
                 }
             }
             
@@ -210,6 +208,15 @@ struct BottomBarView: View {
         
         self.browserController.openNewPage(having: self.interactableText)
         //TODO: validate and open + autocheck 
+    }
+    
+    private func onQuickPickAddressContainerTapped () {
+        withAnimation(Animation.easeInOut) {
+            self.isShowingInteractableTextField = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)){
+                self.isSerachFieldFocused = true
+            }
+        }
     }
 
 }
