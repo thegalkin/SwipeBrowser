@@ -134,7 +134,9 @@ struct BottomBarView: View {
     private var tabsViewButtons: some View {
         HStack {
             tabsButton
-            
+            Spacer ()
+            settingsButton
+            Spacer ()
             rightBarButton
         }
     }
@@ -191,7 +193,7 @@ struct BottomBarView: View {
     
     private var tabsButton: some View {
         Button {
-            self.pageViewModel.isShowingTabsView = true
+            self.browserController.isShowingTabsView.toggle()
         } label: {
             Image(systemName: "rectangle.stack.fill")
                 .foregroundStyle(.bar)
@@ -201,8 +203,13 @@ struct BottomBarView: View {
     
     @ViewBuilder
     private var rightBarButton: some View {
-        if self.pageViewModel.isShowingNewTabView {
-            searchButton
+        //такая странная реализация обусловленна отсутвием в TabsView PageViewModel
+        if !self.browserController.isShowingTabsView{
+            if self.pageViewModel.isShowingNewTabView {
+                searchButton
+            } else {
+                newTabButton
+            }
         } else {
             newTabButton
         }

@@ -17,7 +17,7 @@ struct PageView: View {
     
     let open: URL?
     
-    @StateObject var pageViewModel: PageViewModel = .init()
+    @EnvironmentObject var pageViewModel: PageViewModel
     @EnvironmentObject var browserController: BrowserController
     
     @State var pageOffset: CGFloat = 0
