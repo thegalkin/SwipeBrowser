@@ -11,10 +11,7 @@ import WebKit
 struct WebContentView: View {
     @EnvironmentObject var pageViewModel: PageViewModel
     var body: some View {
-//        Image("stunt_double")
-//            .resizable()
-//            .scaledToFill()
-                WebView(url: $pageViewModel.currentAddress)
+        WebView(url: $pageViewModel.currentAddress)
     }
 }
 
@@ -28,6 +25,8 @@ struct WebView: UIViewRepresentable {
     
     @Binding var url: URL?
     @State private var webViewReloadOrdered: Bool = false
+    @EnvironmentObject var pageViewModel: PageViewModel
+    @EnvironmentObject var browserController: BrowserController
     
     func makeUIView(context: Context) -> WKWebView {
         let wkWebView: WKWebView = .init()
@@ -36,6 +35,7 @@ struct WebView: UIViewRepresentable {
         refreshControll.addTarget(context.coordinator, action: #selector(Coordinator.handleRefreshControl), for: .valueChanged)
         wkWebView.allowsBackForwardNavigationGestures = true
         wkWebView.scrollView.addSubview(refreshControll)
+        wkWebView.uiDelegate = context.coordinator
         return wkWebView
     }
     
@@ -52,7 +52,7 @@ struct WebView: UIViewRepresentable {
         Coordinator(self)
     }
     
-    class Coordinator: NSObject {
+    class Coordinator: NSObject, WKUIDelegate {
         var control: WebView
         
         init(_ control: WebView) {
@@ -64,13 +64,12 @@ struct WebView: UIViewRepresentable {
             control.webViewReloadOrdered = true
             sender.endRefreshing()
         }
+        
+        func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+            guard let url = navigationAction.request.url else {return nil}
+            self.control.browserController.openNewPage(with: url)
+            return nil
+        }
     }
 }
 
-//final fileprivate class WebContentCoordinator {
-//    var
-//    init(refreshControll: UIRefreshControl) {
-//
-//    }
-
-//}
