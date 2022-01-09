@@ -43,11 +43,13 @@ struct TabsView: View {
         Text("No tabs yet, add one?")
             .foregroundColor(Color.white)
     }
+    
+    private let coloumn: GridItem = GridItem.init(GridItem.Size.fixed(CGFloat(30.0)),
+                                                  spacing: CGFloat(10.0),
+                                                  alignment: Alignment.center)
     private var allTabsView: some View {
-        LazyVGrid(columns:
-                    [GridItem.init(GridItem.Size.fixed(CGFloat(30.0)),
-                                   spacing: CGFloat(10.0),
-                                   alignment: Alignment.center)],
+        
+        LazyVGrid(columns: [coloumn, coloumn],
                   alignment: HorizontalAlignment.center,
                   spacing: CGFloat(10.0)
         ){
