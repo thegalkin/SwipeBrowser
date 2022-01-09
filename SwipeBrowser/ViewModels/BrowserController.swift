@@ -7,6 +7,7 @@
 
 import Combine
 import SwiftUI
+import WebKit
 
 //@MainActor
 final class BrowserController: ObservableObject {
@@ -18,6 +19,24 @@ final class BrowserController: ObservableObject {
     @Published var newPageButtonIsOn: Bool = true
     
     @Published var isShowingSettingsSheet: Bool = false
+    
+    @Published var isShowingTabsView: Bool = false
+    
+    var tabsList: Array<Tab> {
+        get {
+            if let data: Data = UserDefaults.standard.value(forKey: "currentTabURL") as? Data {
+                if let decoded = try? PropertyListDecoder().decode(Array<Tab>.self, from: data) {
+                    return decoded
+                }
+            }
+            return Array<Tab>.init()
+        }
+        set(newVal) {
+            UserDefaults.standard.set(try? PropertyListEncoder().encode(newVal), forKey: "currentTabURL")
+            self.objectWillChange.send()
+            self.currentTabViewID = UUID ()
+        }
+    }
     
     var currentTabURL: URL? {
         get {
@@ -109,4 +128,11 @@ struct FavoriteLink: Codable {
     var name: String
     /**png*/
     var image: Data?
+}
+
+struct Tab: Identifiable, Codable {
+    var id: UUID
+    var url: URL
+    var snapShot: Data?
+    var webView: Data?
 }
