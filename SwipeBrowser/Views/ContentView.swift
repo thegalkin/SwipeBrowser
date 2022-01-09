@@ -12,12 +12,22 @@ struct ContentView: View {
     @StateObject var browserController: BrowserController = .init()
     
     @State var isShowingPage: Bool = false
+    @State private var offset: CGFloat = 200
+
     var body: some View {
-        ZStack {
-            PageView (open: URL(string: "https://beta.shazoo.ru")!)
-                .transition(.windmillRotationEnter)
+        VStack{
+            //FIXME: транзишн insertion и removal кажется путаются, надо их распутать. view улетает непойми куда
+            PageView (open: self.browserController.currentTabURL)                
+                .transition(.asymmetric(insertion: AnyTransition.windmillRotationEnter, removal: AnyTransition.windmillRotationExit))
+                .id(self.browserController.currentTabViewID)
+                .environmentObject(browserController)
+            
+                .onAppear {
+                    self.browserController.currentTabURL = URL(string: "https://beta.shazoo.ru")!
+                }
+                
         }
-        .environmentObject(browserController)
+        
     }
 }
 

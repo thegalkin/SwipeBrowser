@@ -9,12 +9,12 @@ import SwiftUI
 fileprivate let screenWidth: CGFloat = UIScreen.main.bounds.width
 extension AnyTransition {
     static var windmillRotationExit: AnyTransition {
-        .modifier(active: WindmillRotationModifier(pageOffset: 0, isOpening: false),
-                  identity: WindmillRotationModifier(pageOffset: screenWidth, isOpening: false))
+        .modifier(active: WindmillRotationModifier(pageOffset: -screenWidth, isOpening: false),
+                  identity: WindmillRotationModifier(pageOffset: 0, isOpening: false))
     }
     static var windmillRotationEnter: AnyTransition {
         .modifier(active: WindmillRotationModifier(pageOffset: 0, isOpening: true),
-                  identity: WindmillRotationModifier(pageOffset: screenWidth, isOpening: true))
+                  identity: WindmillRotationModifier(pageOffset: -screenWidth, isOpening: true))
     }
 }
 
