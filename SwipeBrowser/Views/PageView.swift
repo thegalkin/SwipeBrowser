@@ -15,7 +15,7 @@ import SwiftUI
  */
 struct PageView: View {
     
-    let open: URL
+    let open: URL?
     
     @StateObject var pageViewModel: PageViewModel = .init()
     @EnvironmentObject var browserController: BrowserController
@@ -50,12 +50,15 @@ struct PageView: View {
         .onAppear {
             // странный способ инициализации, чтобы избежать бага с multiple appear
             self.pageViewModel.setAddress(with: self.open)
+            if self.open == nil {
+                self.pageOffset = self.screenWidth
+            }
         }
     }
     
 //    MARK: - Buttom Bar
     private var bottomBar: some View {
-            BottomBarView ()
+            BottomBarView (isInTabsView: false)
                 .environmentObject(pageViewModel)
     }
     
@@ -232,10 +235,6 @@ struct PageView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
             self.browserController.newTabOrderPromised = false
         }
-    }
-    
-    private func presentNewSite (with url: URL) {
-        
     }
     
 }

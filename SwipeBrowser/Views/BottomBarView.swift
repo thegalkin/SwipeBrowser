@@ -11,6 +11,8 @@ struct BottomBarView: View {
     @EnvironmentObject var pageViewModel: PageViewModel
     @EnvironmentObject var browserController: BrowserController
     
+    let isInTabsView: Bool
+    
     ///empty if there is a pageViewModel's nonempty
     @State private var interactableText: String = .init()
     
@@ -28,7 +30,7 @@ struct BottomBarView: View {
     
     
     private var content: some View {
-        BackgroundRectangle
+        backgroundRectangle
             .frame(width: .infinity, height: 34)
             .ignoresSafeArea(SafeAreaRegions.all, edges: Edge.Set.bottom)
     }
@@ -102,18 +104,49 @@ struct BottomBarView: View {
             
     }
     
-    private var BackgroundRectangle: some View {
+    private var backgroundRectangle: some View {
         GeometryReader { size in
             Rectangle ()
                 .background(.thinMaterial)
                 .overlay {
-                    HStack {
-                        tabsButton
-                        addressField(in: size)
-                        rightBarButton
-                    }
+                    buttomButtons(size: size)
                 }
         }
+    }
+    
+    @ViewBuilder
+    private func buttomButtons(size: GeometryProxy) -> some View {
+        if self.isInTabsView {
+            tabsViewButtons
+        } else {
+            pageButtons(size: size)
+        }
+    }
+    
+    private func pageButtons(size: GeometryProxy) -> some View {
+        HStack {
+            tabsButton
+            addressField(in: size)
+            rightBarButton
+        }
+    }
+    
+    private var tabsViewButtons: some View {
+        HStack {
+            tabsButton
+            
+            rightBarButton
+        }
+    }
+    
+    private var settingsButton: some View {
+        Button {
+            self.browserController.isShowingSettingsSheet = true
+        } label: {
+            Image(systemName: "gear.circle.fill")
+                .foregroundStyle(.bar)
+        }
+        .padding()
     }
     
     @ViewBuilder
@@ -228,7 +261,7 @@ struct NewPageView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
             NewPageView ()
-            BottomBarView()
+            BottomBarView(isInTabsView: false)
         }
         .environmentObject(pageViewModel)
         .environmentObject(browserController)

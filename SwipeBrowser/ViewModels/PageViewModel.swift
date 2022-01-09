@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 final class PageViewModel: ObservableObject {
-    @Published var hasSetCurrentAddressBefore: Bool = false
+//    @Published var hasSetCurrentAddressBefore: Bool = false
     @Published var currentAddress: URL? = nil
     @Published var pageHistory: [URL]?
     
@@ -18,11 +18,11 @@ final class PageViewModel: ObservableObject {
     /**computed; don't touch**/
     @Published var isShowingNewTabView: Bool = false
     
-    public func setAddress(with url: URL) {
-        if !hasSetCurrentAddressBefore {
+    public func setAddress(with url: URL?) {
+//        if !hasSetCurrentAddressBefore {
             self.currentAddress = url
-            self.hasSetCurrentAddressBefore = true
-        }
+//            self.hasSetCurrentAddressBefore = true
+//        }
     }
 }
 

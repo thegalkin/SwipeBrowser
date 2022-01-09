@@ -17,7 +17,26 @@ final class BrowserController: ObservableObject {
 //  MARK: - Params
     @Published var newPageButtonIsOn: Bool = true
     
+    @Published var isShowingSettingsSheet: Bool = false
     
+    var currentTabURL: URL? {
+        get {
+            if let data: Data = UserDefaults.standard.value(forKey: "currentTabURL") as? Data {
+                if let decoded = try? PropertyListDecoder().decode(URL.self, from: data) {
+                    return decoded
+                }
+            }
+            return nil
+        }
+        set(newVal) {
+            UserDefaults.standard.set(try? PropertyListEncoder().encode(newVal), forKey: "currentTabURL")
+            self.objectWillChange.send()
+            self.currentTabViewID = UUID ()
+            
+        }
+    }
+    
+    @Published var currentTabViewID: UUID = .init()
     
 //  MARK: - ButtomBar commands
     public func openNewEmptyPage() {
@@ -25,10 +44,22 @@ final class BrowserController: ObservableObject {
     }
     
     public func openNewPage(with url: URL) {
-        
+        self.currentTabURL = url
     }
     
     public func openNewPage(having str: String) {
+        var components: URLComponents = .init()
+        components.scheme = "https"
+        components.host = str
+        if let url: URL = components.url {
+            self.currentTabURL = url
+        } else {
+            //link failed, initiating search query
+            
+            let searchQuery: SearchEngineBuilder = .init(searchEngine: SearchEngineBuilder.selectedSearchEngine, searchQuery: str)
+            guard let url: URL = searchQuery.url else {return}
+            self.currentTabURL = url
+        }
         
     }
     
