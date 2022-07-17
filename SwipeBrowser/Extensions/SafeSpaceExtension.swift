@@ -1,5 +1,5 @@
 //
-//  safeSpaceExtencion.swift
+//  SafeSpaceExtension.swift
 //  MyPrepod13
 //
 //  Created by Никита Галкин on 12.02.2021.

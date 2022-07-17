@@ -14,10 +14,10 @@ struct BottomBarView: View {
     let isInTabsView: Bool
     
     ///empty if there is a pageViewModel's nonempty
-    @State private var interactableText: String = .init()
+    @State private var intractableText: String = .init()
     
-    @State private var isShowingInteractableTextField: Bool = false
-    @FocusState private var isSerachFieldFocused: Bool
+    @State private var isShowingIntractableTextField: Bool = false
+    @FocusState private var isSearchFieldFocused: Bool
     
     let placeholder: String = String("Search or site...")
     
@@ -37,13 +37,13 @@ struct BottomBarView: View {
     
     @ViewBuilder
     private var resignFromKeyboardGestureRecogniserView: some View {
-        if self.isShowingInteractableTextField {
+        if self.isShowingIntractableTextField {
             Color.white
                 .opacity(0.001)
                 .onTapGesture {
                     withAnimation(Animation.easeInOut) {
-                        self.isSerachFieldFocused = false
-                        self.isShowingInteractableTextField = false
+                        self.isSearchFieldFocused = false
+                        self.isShowingIntractableTextField = false
                     }
                 }
         } else {
@@ -55,7 +55,7 @@ struct BottomBarView: View {
         Binding(
             get: {
                 if self.pageViewModel.isShowingNewTabView{
-                    let val: String = self.interactableText
+                    let val: String = self.intractableText
                     return val
                 } else {
                     let url: URL? = self.pageViewModel.currentAddress
@@ -63,13 +63,13 @@ struct BottomBarView: View {
                         let host: String = url.host ?? String()
                         return host
                     } else {
-                        let val: String = self.interactableText
+                        let val: String = self.intractableText
                         return val
                     }
                 }
             },
             set: { (newVal: String) in
-                self.interactableText = newVal
+                self.intractableText = newVal
             }
         )
     }
@@ -88,20 +88,17 @@ struct BottomBarView: View {
     private var interactableTextField: some View {
         TextField("", text: self.currentAddressStringBinding)
 //            .tint(Color.white)
-            .focused(self.$isSerachFieldFocused)
+            .focused(self.$isSearchFieldFocused)
             .placeholder(when: self.currentAddressStringBinding.wrappedValue.isEmpty) {
                 Text(self.placeholder)
                     .foregroundColor(.white)
             }
-            
             .foregroundColor(.white)
             .onSubmit {
                 self.onBottomTextFieldSubmit ()
             }
             .textInputAutocapitalization(.never)
             .disableAutocorrection(true)
-            
-            
     }
     
     private var backgroundRectangle: some View {
@@ -160,7 +157,7 @@ struct BottomBarView: View {
                     self.onQuickPickAddressContainerTapped ()
                 }
             GeometryReader { textFieldSize in
-                if self.isShowingInteractableTextField {
+                if self.isShowingIntractableTextField {
                     interactableTextField
                         .transition(
                             AnyTransition.offset(x: CGFloat(textFieldSize.size.width / CGFloat(3)),
@@ -219,7 +216,7 @@ struct BottomBarView: View {
         Button {
             self.onBottomTextFieldSubmit()
         } label: {
-            if self.isShowingInteractableTextField {
+            if self.isShowingIntractableTextField {
                 Image(systemName: "magnifyingglass.circle")
                     .foregroundStyle(.green, .bar)
             } else {
@@ -229,6 +226,7 @@ struct BottomBarView: View {
             
         }
         .padding()
+        .disabled(self.currentAddressStringBinding.wrappedValue.isEmpty)
     }
     
     private var newTabButton: some View {
@@ -243,18 +241,18 @@ struct BottomBarView: View {
     }
     
     private func onBottomTextFieldSubmit () {
-        self.isSerachFieldFocused = false
-        self.isShowingInteractableTextField = false
+        self.isSearchFieldFocused = false
+        self.isShowingIntractableTextField = false
         
-        self.browserController.openNewPage(having: self.interactableText)
+        self.browserController.openNewPage(having: self.intractableText)
         //TODO: validate and open + autocheck 
     }
     
     private func onQuickPickAddressContainerTapped () {
         withAnimation(Animation.easeInOut) {
-            self.isShowingInteractableTextField = true
+            self.isShowingIntractableTextField = true
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)){
-                self.isSerachFieldFocused = true
+                self.isSearchFieldFocused = true
             }
         }
     }
@@ -274,6 +272,9 @@ struct NewPageView_Previews: PreviewProvider {
         .environmentObject(browserController)
         .onAppear {
             self.pageViewModel.isShowingNewTabView = true
+            if self.pageViewModel.currentAddress == nil {
+                self.pageViewModel.setAddress(with: URL(string: "https://shazoo.ru")!)
+            }
             self.pageViewModel.setAddress(with: URL(string: "https://shazoo.ru")!)
         }
         //        ContentView ()

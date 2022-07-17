@@ -57,32 +57,6 @@ final class BrowserController: ObservableObject {
     
     @Published var currentTabViewID: UUID = .init()
     
-//  MARK: - ButtomBar commands
-    public func openNewEmptyPage() {
-        self.newTabOrderPromised = true
-    }
-    
-    public func openNewPage(with url: URL) {
-        self.currentTabURL = url
-    }
-    
-    public func openNewPage(having str: String) {
-        var components: URLComponents = .init()
-        components.scheme = "https"
-        components.host = str
-        if let url: URL = components.url {
-            self.currentTabURL = url
-        } else {
-            //link failed, initiating search query
-            
-            let searchQuery: SearchEngineBuilder = .init(searchEngine: SearchEngineBuilder.selectedSearchEngine, searchQuery: str)
-            guard let url: URL = searchQuery.url else {return}
-            self.currentTabURL = url
-        }
-        
-    }
-    
-    
 //  MARK: - Favorite Links
     //TODO: propper adding link as in Yandex Browser
     public func addSiteToFavorites(with url: URL, at location: Int) {
@@ -116,6 +90,33 @@ final class BrowserController: ObservableObject {
         set(newVal) {
             UserDefaults.standard.set(try? PropertyListEncoder().encode(newVal), forKey: "favoriteLinks")
             self.objectWillChange.send()
+        }
+    }
+}
+
+//Mark: - Navigation
+extension BrowserController {
+    //  MARK: - BottomBar commands
+    public func openNewEmptyPage() {
+        self.newTabOrderPromised = true
+    }
+
+    public func openNewPage(with url: URL) {
+        self.currentTabURL = url
+    }
+
+    public func openNewPage(having str: String) {
+        var components: URLComponents = .init()
+        components.scheme = "https"
+        components.host = str
+        if let url: URL = components.url {
+            self.currentTabURL = url
+        } else {
+            //link failed, initiating search query
+
+            let searchQuery: SearchEngineBuilder = .init(searchEngine: SearchEngineBuilder.selectedSearchEngine, searchQuery: str)
+            guard let url: URL = searchQuery.url else {return}
+            self.currentTabURL = url
         }
     }
 }

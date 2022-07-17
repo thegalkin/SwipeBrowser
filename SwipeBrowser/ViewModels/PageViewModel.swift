@@ -11,12 +11,16 @@ import Combine
 final class PageViewModel: ObservableObject {
 //    @Published var hasSetCurrentAddressBefore: Bool = false
     @Published var currentAddress: URL? = nil
+    @Published var currentWebView: UIView? = nil
     @Published var pageHistory: [URL]?
     
     @Published var bottomBar: BottomBar = .init ()
     @Published var isShowingTabsView: Bool = false
     /**computed; don't touch**/
     @Published var isShowingNewTabView: Bool = false
+    
+    @Published var topAndBottomSafeAreaCalayerScans: VerticalLayerScan = .init()
+    @Published var topAndBottomSafeAreaScanningTimer: Timer? = nil 
     
     public func setAddress(with url: URL?) {
 //        if !hasSetCurrentAddressBefore {

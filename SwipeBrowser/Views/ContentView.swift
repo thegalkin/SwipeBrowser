@@ -33,12 +33,11 @@ struct ContentView: View {
             PageView (open: self.browserController.currentTabURL)
                 .transition(.asymmetric(insertion: AnyTransition.windmillRotationEnter, removal: AnyTransition.windmillRotationExit))
                 .id(self.browserController.currentTabViewID)
-                
-            
                 .onAppear {
-                    self.browserController.currentTabURL = URL(string: "https://beta.shazoo.ru")!
+                    if self.browserController.currentTabURL == nil {
+                        self.browserController.currentTabURL = URL(string: "https://beta.shazoo.ru")!
+                    }
                 }
-            
         }
     }
     

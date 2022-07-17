@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WebKit
+import Combine
 /** Репрезентация сайтов как она есть*/
 struct WebContentView: View {
     @EnvironmentObject var pageViewModel: PageViewModel
@@ -27,15 +28,19 @@ struct WebView: UIViewRepresentable {
     @State private var webViewReloadOrdered: Bool = false
     @EnvironmentObject var pageViewModel: PageViewModel
     @EnvironmentObject var browserController: BrowserController
+    @State private var cancellables: Set<AnyCancellable> = .init()
     
     func makeUIView(context: Context) -> WKWebView {
         let wkWebView: WKWebView = .init()
-        let refreshControll: UIRefreshControl = .init()
-        refreshControll.backgroundColor = .clear
-        refreshControll.addTarget(context.coordinator, action: #selector(Coordinator.handleRefreshControl), for: .valueChanged)
+        let refreshControl: UIRefreshControl = .init()
+        refreshControl.backgroundColor = .clear
+        refreshControl.addTarget(context.coordinator, action: #selector(Coordinator.handleRefreshControl), for: .valueChanged)
         wkWebView.allowsBackForwardNavigationGestures = true
-        wkWebView.scrollView.addSubview(refreshControll)
+        wkWebView.scrollView.addSubview(refreshControl)
         wkWebView.uiDelegate = context.coordinator
+        wkWebView.navigationDelegate = context.coordinator
+        setUpObservers(for: wkWebView)
+        saveUIViewToPageViewModel(for: wkWebView)
         return wkWebView
     }
     
@@ -43,16 +48,30 @@ struct WebView: UIViewRepresentable {
         guard let url = url else {
             return
         }
-        
-        let request = URLRequest(url: url)
-        webView.load(request)
+        if webView.url?.deletingLastPathSlash() != url.deletingLastPathSlash() {
+            let request = URLRequest(url: url)
+            webView.load(request)
+        }
     }
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
     
-    class Coordinator: NSObject, WKUIDelegate {
+    func saveUIViewToPageViewModel (for uiView: UIView) {
+        self.pageViewModel.currentWebView = uiView
+    }
+    
+    private func setUpObservers (for wkWebView: WKWebView) {
+        wkWebView.url
+            .publisher
+            .sink { (newUrl: URL?) in
+                self.url = newUrl
+            }
+            .store(in: &cancellables)
+    }
+    
+    class Coordinator: NSObject, WKUIDelegate, WKNavigationDelegate {
         var control: WebView
         
         init(_ control: WebView) {
@@ -69,6 +88,12 @@ struct WebView: UIViewRepresentable {
             guard let url = navigationAction.request.url else {return nil}
             self.control.browserController.openNewPage(with: url)
             return nil
+        }
+        
+        func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+            if let url: URL = webView.url {
+                self.control.url = url
+            }
         }
     }
 }

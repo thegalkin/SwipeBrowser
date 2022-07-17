@@ -37,11 +37,7 @@ struct NewPageView: View {
                 }
             
         }
-        .ignoresSafeArea()
-        
-        
-        
-        
+        .ignoresSafeArea()  
     }
     
     private func linkCell(opens favoriteLink: FavoriteLink) -> some View {

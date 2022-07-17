@@ -18,4 +18,12 @@ extension View {
                 self
             }
         }
+    func eraseToAnyView() -> AnyView {
+        return AnyView(self)
+    }
+    
+    func getUIView () -> UIView {
+        let uiView: UIView = UIHostingController.init(rootView: self.body).view
+        return uiView
+    }
 }
