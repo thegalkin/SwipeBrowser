@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 public extension URL {
     func deletingLastPathSlash () -> URL {
@@ -17,6 +18,13 @@ public extension URL {
         } else {
             return self
         }
+    }
+    
+    var isValid: Bool {
+        let urlRegEx = String("^(https?://)?(www\\.)?([-a-z0-9]{1,63}\\.)*?[a-z0-9][-a-z0-9]{0,61}[a-z0-9]\\.[a-z]{2,6}(/[-\\w@\\+\\.~#\\?&/=%]*)?$")
+        let urlTest = NSPredicate(format:"SELF MATCHES %@", urlRegEx)
+        let result = urlTest.evaluate(with: self.absoluteString)
+        return result
     }
 }
 

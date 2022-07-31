@@ -30,12 +30,12 @@ struct ContentView: View {
     private var pageView: some View {
         VStack{
             //FIXME: транзишн insertion и removal кажется путаются, надо их распутать. view улетает непойми куда
-            PageView (open: self.browserController.currentTabURL)
+            PageView (open: self.$browserController.currentTabURL)
                 .transition(.asymmetric(insertion: AnyTransition.windmillRotationEnter, removal: AnyTransition.windmillRotationExit))
-                .id(self.browserController.currentTabViewID)
+//                .id(self.browserController.currentTabViewID)
                 .onAppear {
                     if self.browserController.currentTabURL == nil {
-                        self.browserController.currentTabURL = URL(string: "https://beta.shazoo.ru")!
+                        self.browserController.currentTabURL = URL(string: "https://shazoo.ru")!
                     }
                 }
         }

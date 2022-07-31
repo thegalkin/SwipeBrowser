@@ -106,17 +106,19 @@ extension BrowserController {
     }
 
     public func openNewPage(having str: String) {
-        var components: URLComponents = .init()
-        components.scheme = "https"
-        components.host = str
-        if let url: URL = components.url {
-            self.currentTabURL = url
-        } else {
-            //link failed, initiating search query
-
-            let searchQuery: SearchEngineBuilder = .init(searchEngine: SearchEngineBuilder.selectedSearchEngine, searchQuery: str)
-            guard let url: URL = searchQuery.url else {return}
-            self.currentTabURL = url
+        DispatchQueue.main.async {
+            var components: URLComponents = .init()
+            components.scheme = "https"
+            components.host = str
+            if let url: URL = components.url, url.isValid {
+                self.currentTabURL = url
+            } else {
+                //link failed, initiating search query
+                
+                let searchQuery: SearchEngineBuilder = .init(searchEngine: SearchEngineBuilder.selectedSearchEngine, searchQuery: str)
+                guard let url: URL = searchQuery.url else {return}
+                self.currentTabURL = url
+            }
         }
     }
 }

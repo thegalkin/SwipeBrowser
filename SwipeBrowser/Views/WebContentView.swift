@@ -29,6 +29,10 @@ struct WebView: UIViewRepresentable {
     @EnvironmentObject var pageViewModel: PageViewModel
     @EnvironmentObject var browserController: BrowserController
     @State private var cancellables: Set<AnyCancellable> = .init()
+    ///to solve chicken and egg problem with incomming url from textfield and redirect url(meanwhile having a constant reload of the view)
+    @State var previousWebViewURL: URL?
+    
+    @State private var queue: DispatchQueue = .init(label: String("WebViewQueue"), qos: DispatchQoS.userInteractive)
     
     func makeUIView(context: Context) -> WKWebView {
         let wkWebView: WKWebView = .init()
@@ -41,17 +45,15 @@ struct WebView: UIViewRepresentable {
         wkWebView.navigationDelegate = context.coordinator
         setUpObservers(for: wkWebView)
         saveUIViewToPageViewModel(for: wkWebView)
+        self.previousWebViewURL = self.url
         return wkWebView
     }
     
     func updateUIView(_ webView: WKWebView, context: Context) {
-        guard let url = url else {
-            return
-        }
-        if webView.url?.deletingLastPathSlash() != url.deletingLastPathSlash() {
-            let request = URLRequest(url: url)
-            webView.load(request)
-        }
+        
+        checkForRedirect(webView)
+        
+        compareToAddressFieldAndCheckForBlankPage(webView)
     }
     
     func makeCoordinator() -> Coordinator {
@@ -69,6 +71,45 @@ struct WebView: UIViewRepresentable {
                 self.url = newUrl
             }
             .store(in: &cancellables)
+    }
+    
+    private func isBlankPage (_ webView: WKWebView) -> Bool {
+        var err: Error?
+        Task {
+            err = await withCheckedContinuation { continuation in
+                webView.evaluateJavaScript("document.querySelector('body').innerHTML") { (result, error) in
+                    continuation.resume(returning: error)
+                }
+            }
+        }
+        
+        return err != nil
+    }
+    ///to solve chicken and egg problem with incomming url from textfield and redirect url(meanwhile having a constant reload of the view)
+    
+    private func checkForRedirect(_ webView: WKWebView) {
+        //FIXME: реши проблему курицы и яица в первую очередь - она ломает загрузку страниц
+        DispatchQueue.main.async {
+            let urlWithDeletedLastPathSlash: URL? = webView.url?.deletingLastPathSlash()
+            if urlWithDeletedLastPathSlash != self.previousWebViewURL {
+                self.previousWebViewURL = urlWithDeletedLastPathSlash
+                self.url = urlWithDeletedLastPathSlash
+            }
+        }
+    }
+    
+    private func compareToAddressFieldAndCheckForBlankPage(_ webView: WKWebView) {
+        DispatchQueue.main.async {
+            guard let url = url else {
+                return
+            }
+            if webView.url?.deletingLastPathSlash() != url.deletingLastPathSlash() || isBlankPage(webView) {
+                if url.isValid {
+                    let request = URLRequest(url: url)
+                    webView.load(request)
+                }
+            }
+        }
     }
     
     class Coordinator: NSObject, WKUIDelegate, WKNavigationDelegate {
@@ -93,7 +134,28 @@ struct WebView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
             if let url: URL = webView.url {
                 self.control.url = url
+                
             }
+        }
+        
+        func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+            print("didCommitNavigation - content arriving?")
+        }
+        
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            print("didFailNavigation")
+        }
+        
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            print("didStartProvisionalNavigation")
+        }
+        
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            print("didFailProvisionalNavigation")
+        }
+                
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            print("didFinishNavigation")
         }
     }
 }

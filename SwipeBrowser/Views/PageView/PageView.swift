@@ -15,7 +15,7 @@ import SwiftUI
  */
 struct PageView: View {
     
-    let open: URL?
+    @Binding var open: URL?
     
     @EnvironmentObject var pageViewModel: PageViewModel
     @EnvironmentObject var browserController: BrowserController
@@ -47,9 +47,12 @@ struct PageView: View {
                 self.browserController.newPageButtonIsOn = true
             }
         }
+        .onChange(of: self.open) { (newVal: URL?) in
+            self.pageViewModel.setAddress(with: newVal)
+        }
         .onAppear {
             // странный способ инициализации, чтобы избежать бага с multiple appear
-            if self.pageViewModel.currentAddress == nil {
+            if self.pageViewModel.currentAddress == nil && self.open != nil {
                 self.pageViewModel.setAddress(with: self.open)
             }
             if self.open == nil {
@@ -68,14 +71,14 @@ struct PageView: View {
     private var currentPage: some View {
         GeometryReader { (geo: GeometryProxy) in
             VStack {
-                topSafeAreaScan
+//                topSafeAreaScan
                 WebContentView ()
                     .environmentObject(pageViewModel)
                     .frame(height: SafeAreaRegions.window?.frame.height ?? CGFloat.zero - SafeAreaRegions.topOrZero - SafeAreaRegions.bottomOrZero)
 #if DEBUG
                     .border(.pink)
 #endif
-                bottomSafeAreaScan
+//                bottomSafeAreaScan
             }
         }
     }
@@ -87,7 +90,8 @@ struct PageView: View {
                 .scaleEffect(self.currentPageScaleScale.wrappedValue)
                 .offset(x: pageOffset, y: currentPageYOffset.wrappedValue)
                 .onAppear {
-                    self.startTimer()
+                    //FIXME: отключил таймер, потому что сканироване ломает загрузку страниц и они показывают черный экран
+//                    self.startTimer()
                 }
                 
 //                .onDisappear{

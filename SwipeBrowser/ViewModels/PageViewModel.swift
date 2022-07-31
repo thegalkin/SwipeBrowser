@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import WebKit
 
 final class PageViewModel: ObservableObject {
 //    @Published var hasSetCurrentAddressBefore: Bool = false
@@ -26,11 +27,21 @@ final class PageViewModel: ObservableObject {
 //        if !hasSetCurrentAddressBefore {
             self.currentAddress = url
 //            self.hasSetCurrentAddressBefore = true
+        setUpLoadingProgressPublisher()
 //        }
+    }
+    
+    var cancellables: Set<AnyCancellable> = .init()
+    private func setUpLoadingProgressPublisher () {
+        guard let webView: WKWebView = currentWebView as? WKWebView else { return }
+        webView
+            .publisher(for: \.estimatedProgress, options: [.new])
+            .assign(to: \.bottomBar.loadingProgress, on: self)
+            .store(in: &cancellables)
     }
 }
 
-
 struct BottomBar {
     var color: Color = .accentColor
+    var loadingProgress: Double = 0
 }
