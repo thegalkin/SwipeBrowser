@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 /**Нижний бар с адресной строкой**/
 struct BottomBarView: View {
     @EnvironmentObject var pageViewModel: PageViewModel
@@ -14,7 +15,7 @@ struct BottomBarView: View {
     let isInTabsView: Bool
     
     ///empty if there is a pageViewModel's nonempty
-    @State private var intractableText: String = .init()
+    @State var intractableText: String = .init()
     
     @State private var isShowingIntractableTextField: Bool = false
     @FocusState private var isSearchFieldFocused: Bool
@@ -22,8 +23,9 @@ struct BottomBarView: View {
     let placeholder: String = String("Search or site...")
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             resignFromKeyboardGestureRecogniserView
+            loadingProgressBar
             content
         }
     }
@@ -80,7 +82,7 @@ struct BottomBarView: View {
             Text(self.placeholder)
                 .foregroundColor(.white)
         } else {
-            Text(self.pageViewModel.currentAddress?.host ?? "")
+            Text(self.pageViewModel.currentAddress?.host ?? self.placeholder)
                 .foregroundColor(.white)
         }
     }
@@ -90,8 +92,13 @@ struct BottomBarView: View {
 //            .tint(Color.white)
             .focused(self.$isSearchFieldFocused)
             .placeholder(when: self.currentAddressStringBinding.wrappedValue.isEmpty) {
-                Text(self.placeholder)
-                    .foregroundColor(.white)
+                if self.currentAddressStringBinding.wrappedValue.isEmpty {
+                    Text(self.placeholder)
+                        .foregroundColor(self.isSearchFieldFocused ? Color.gray : Color.white)
+                } else {
+                    EmptyView ()
+                }
+                
             }
             .foregroundColor(.white)
             .onSubmit {
@@ -238,6 +245,11 @@ struct BottomBarView: View {
         }
         .padding()
         .disabled(!self.browserController.newPageButtonIsOn)
+    }
+    
+    @ViewBuilder
+    private var loadingProgressBar: some View {
+        LoadingProgressBar()
     }
     
     private func onBottomTextFieldSubmit () {
