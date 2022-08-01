@@ -26,6 +26,22 @@ public extension URL {
         let result = urlTest.evaluate(with: self.absoluteString)
         return result
     }
+    
 }
 
-
+extension URL {
+    var rootDomain: String? {
+//        guard let hostName = self.host else { return nil }
+        let components = self.absoluteString.components(separatedBy: ".")
+        
+        if components.count == 2 {
+            return components[0]
+        }
+        
+        if components.count > 2 {
+            return components.suffix(2).joined(separator: ".")
+        } else {
+            return self.absoluteString
+        }
+    }
+}

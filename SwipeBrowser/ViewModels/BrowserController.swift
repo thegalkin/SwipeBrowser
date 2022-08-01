@@ -59,16 +59,9 @@ final class BrowserController: ObservableObject {
     
 //  MARK: - Favorite Links
     //TODO: propper adding link as in Yandex Browser
-    public func addSiteToFavorites(with url: URL, at location: Int) {
+    public func addSiteToFavorites(_ newFavoriteLink: FavoriteLink, at location: Int) {
         
         guard 0...5 ~= location else {return}
-        
-        let id: UUID = .init()
-        let isSpecial: Bool = false
-        let name: String = ""
-        let image: UIImage? = nil
-        let encodedImage: Data? = image?.pngData()
-        let newFavoriteLink: FavoriteLink = .init(id: id, url: url, isSpecial: isSpecial, name: name, image: encodedImage)
         
         self.favoriteLinks[location] = newFavoriteLink
     }
@@ -126,11 +119,24 @@ extension BrowserController {
 
 struct FavoriteLink: Codable {
     var id: UUID
-    var url: URL
+    var urlString: String
+    var url: URL? {
+        URL(string: urlString)
+    }
     var isSpecial: Bool
     var name: String
     /**png*/
     var image: Data?
+    init(id: UUID, urlString: String, isSpecial: Bool, name: String, image: Data? = nil) {
+        self.id = id
+        self.urlString = urlString
+        self.isSpecial = isSpecial
+        self.name = name
+        self.image = image
+    }
+    var isURLValid: Bool {
+        url?.isValid == true
+    }
 }
 
 struct Tab: Identifiable, Codable {
